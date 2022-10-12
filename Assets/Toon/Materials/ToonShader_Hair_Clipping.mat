@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: ToonShader_Hair_Clipping
   m_Shader: {fileID: 4800000, guid: 345def18d0906d544b7d12b050937392, type: 3}
-  m_ShaderKeywords: _EMISSIVE_SIMPLE _OUTLINE_POS
+  m_ShaderKeywords: _ _EMISSIVE_SIMPLE _OUTLINE_POS
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0

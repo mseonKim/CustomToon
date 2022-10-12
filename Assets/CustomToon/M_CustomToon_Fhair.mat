@@ -56,9 +56,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MatCap_Sampler:
-        m_Texture: {fileID: 2800000, guid: 966eac91234ebbf4fad5eed15f63fa78, type: 3}
+        m_Texture: {fileID: 2800000, guid: 2a97ca8db51c5d347968b667f0fbfde0, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 1, y: 1}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -89,8 +89,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BaseColor_Step: 0.5
-    - _BumpScale: 0
-    - _CullMode: 2
+    - _BlurLevelMatcap: 4.51
+    - _BumpScale: 0.179
+    - _CullMode: 0
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -98,12 +99,15 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _HiIntensity: 0.5
+    - _HiStepMax: 1
+    - _HiStepMin: 0.9
     - _Is_MatCapToBase: 0
     - _Is_NormalMapForMatCap: 1
     - _Is_NormalMapToBase: 1
     - _Is_ShadeMapToBase: 0
     - _LinearStepMax: 0.55
-    - _LinearStepMin: 0.54
+    - _LinearStepMin: 0.53
     - _Metallic: 0
     - _Mode: 0
     - _Nearest_Distance: 0.5
@@ -111,7 +115,7 @@ Material:
     - _Offset_Z: 0
     - _Outline_Width: 3
     - _Parallax: 0.02
-    - _Rim_Strength: 6
+    - _Rim_Strength: 3
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -122,6 +126,8 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _HiColor: {r: 1, g: 1, b: 1, a: 1}
+    - _MatCapColor: {r: 1, g: 1, b: 1, a: 1}
     - _Outline_Color: {r: 0, g: 0, b: 0, a: 1}
     - _RimLightColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadeColor: {r: 0.85882354, g: 0.6666667, b: 0.45490196, a: 1}

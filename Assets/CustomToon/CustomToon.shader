@@ -1,5 +1,4 @@
-// TODO: Reflection, Brush Texture, Hi Color(Specular), Clipping, ForwardAdd(Point Light), Support Transparent?
-// 알아볼 것: Tag의 Light Mode
+// TODO: GI, Clipping, ForwardAdd(Point Light), Support Transparent?
 Shader "CustomToon/Toon" {
     Properties {
         [Enum(OFF,0,FRONT,1,BACK,2)] _CullMode("Cull Mode", int) = 2  //OFF/FRONT/BACK
@@ -17,6 +16,11 @@ Shader "CustomToon/Toon" {
         // Rim Light
         _RimLightColor ("RimLightColor", Color) = (1,1,1,1)
         _Rim_Strength ("Rim_Strength", Float) = 4
+
+        // MatCap
+        _MatCap_Sampler ("MatCap_Sampler", 2D) = "black" {}
+        _BlurLevelMatcap ("Blur Level of MatCap_Sampler", Range(0, 10)) = 0
+        _MatCapColor ("MatCapColor", Color) = (1,1,1,1)
 
         // Outline
         _Outline_Width ("Outline_Width", Float ) = 0

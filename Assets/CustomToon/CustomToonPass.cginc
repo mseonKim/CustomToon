@@ -8,6 +8,9 @@ uniform float _LinearStepMin;
 uniform float _LinearStepMax;
 uniform float4 _RimLightColor;
 uniform float _Rim_Strength;
+uniform sampler2D _MatCap_Sampler; uniform float4 _MatCap_Sampler_ST;
+uniform float _BlurLevelMatcap;
+uniform float4 _MatCapColor;
 
 struct VertexInput {
     float4 vertex : POSITION;
@@ -46,22 +49,29 @@ float4 frag(VertexOutput i) : SV_TARGET {
     float4 color = 0;
     UNITY_LIGHT_ATTENUATION(attenuation, i, i.posWorld.xyz);
 
+    i.normalDir = normalize(i.normalDir);
     float3 _NormalMap_var = tex2D(_NormalMap, i.uv0);
     float3 normal = lerp(i.normalDir, _NormalMap_var, _BumpScale);
 
     // Half Lambert
-    half halfLambert = dot(_WorldSpaceLightPos0, normal) * 0.5 + 0.5;
+    half halfLambert = dot(_WorldSpaceLightPos0, i.normalDir) * 0.5 + 0.5;
     half medTone = LinearStep(_LinearStepMin, _LinearStepMax, halfLambert);
     color = lerp(_ShadeColor, 1, medTone);
 
     // Rim Light
-    float3 viewNormal = normalize(_WorldSpaceCameraPos - i.posWorld).xyz;
-    half fresnel = pow(1 - saturate(dot(viewNormal, normal)), _Rim_Strength);
-    half4 rimColor = half4((_RimLightColor * fresnel).rgb, 1);
+    float3 viewDir = normalize(_WorldSpaceCameraPos - i.posWorld).xyz;
+    half emission = LinearStep(0.25, 0.75, pow(1 - saturate(dot(viewDir, i.normalDir)), _Rim_Strength));
+    half4 rimColor = half4((_RimLightColor * emission).rgb, 1);
     color += lerp(0, rimColor, attenuation);    // Ignore shadowed pixel
 
     color *= _LightColor0;
     color *= _BaseColor * tex2D(_MainTex, i.uv0);
+
+    // Apply Matcap
+    float3 viewNormal = normalize(mul(UNITY_MATRIX_V, normal));
+    float2 matcapUV = viewNormal.xy * 0.5 + 0.5;
+    float3 _MatCap_Sampler_var = tex2Dlod(_MatCap_Sampler, float4(TRANSFORM_TEX(matcapUV, _MatCap_Sampler), 0.0, _BlurLevelMatcap));
+    color += float4(_MatCap_Sampler_var * _MatCapColor, 1);
 
     // Apply Shadow
     color.rgb *= lerp(_ShadeColor.rgb, 1, attenuation);
