@@ -357,6 +357,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &386468743 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1125860869633868, guid: dfd3f8cbb59500946b5f981986c2a23d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1456250341}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &400513666
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,7 +530,7 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
+  m_HDR: 0
   m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
@@ -558,7 +564,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   focus: {x: 0, y: 0.6, z: 0}
-  focusObj: {fileID: 1036948364}
+  focusObj: {fileID: 386468743}
   showInstWindow: 0
 --- !u!114 &794565949
 MonoBehaviour:
@@ -911,12 +917,6 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!1 &1036948364 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1125860869633868, guid: dfd3f8cbb59500946b5f981986c2a23d,
-    type: 3}
-  m_PrefabInstance: {fileID: 1709489819}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1076450055
 GameObject:
   m_ObjectHideFlags: 0
@@ -1349,7 +1349,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: d608b220e5bf0cf4d9776acd4c5f7c69, type: 2}
+      objectReference: {fileID: 2100000, guid: 4aa8ace2fb5e525499ec0d89ca74e9a9, type: 2}
     - target: {fileID: 137731917670969218, guid: dfd3f8cbb59500946b5f981986c2a23d,
         type: 3}
       propertyPath: m_Materials.Array.data[1]

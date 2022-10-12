@@ -1,19 +1,22 @@
-// TODO: Rim Light, Reflection, Brush Texture, Hi Color(Specular), Clipping, ForwardAdd(Point Light), Support Transparent?
+// TODO: Reflection, Brush Texture, Hi Color(Specular), Clipping, ForwardAdd(Point Light), Support Transparent?
 // 알아볼 것: Tag의 Light Mode
 Shader "CustomToon/Toon" {
     Properties {
+        [Enum(OFF,0,FRONT,1,BACK,2)] _CullMode("Cull Mode", int) = 2  //OFF/FRONT/BACK
         _MainTex ("BaseMap", 2D) = "white" {}
         _BaseColor ("BaseColor", Color) = (1,1,1,1)
         _BaseColor_Step ("BaseColor_Step", Range(0, 1)) = 0.5
-        [Enum(OFF,0,FRONT,1,BACK,2)] _CullMode("Cull Mode", int) = 2  //OFF/FRONT/BACK
-        _1st_ShadeMap ("1st_ShadeMap", 2D) = "white" {}
-        _1st_ShadeColor ("1st_ShadeColor", Color) = (1,1,1,1)
-        [Toggle(_)] _Is_NormalMapToBase ("Is_NormalMapToBase", Float ) = 0
         _NormalMap ("NormalMap", 2D) = "bump" {}
+        _BumpScale ("Normal_Scale", Range(0, 1)) = 0
+        _ShadeColor ("ShadeColor", Color) = (1,1,1,1)
 
         // Linear Step
         _LinearStepMin ("LinearStep_Min", Range(0, 1)) = 0.48
         _LinearStepMax ("LinearStep_Max", Range(0, 1)) = 0.52
+
+        // Rim Light
+        _RimLightColor ("RimLightColor", Color) = (1,1,1,1)
+        _Rim_Strength ("Rim_Strength", Float) = 4
 
         // Outline
         _Outline_Width ("Outline_Width", Float ) = 0

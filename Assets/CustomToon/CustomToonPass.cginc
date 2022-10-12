@@ -2,10 +2,12 @@ uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
 uniform float4 _BaseColor;
 uniform float _BaseColor_Step;
 uniform sampler2D _NormalMap; uniform float4 _NormalMap_ST;
-uniform float _Is_NormalMapToBase;
-uniform float4 _1st_ShadeColor;
+uniform float _BumpScale;
+uniform float4 _ShadeColor;
 uniform float _LinearStepMin;
 uniform float _LinearStepMax;
+uniform float4 _RimLightColor;
+uniform float _Rim_Strength;
 
 struct VertexInput {
     float4 vertex : POSITION;
@@ -45,18 +47,24 @@ float4 frag(VertexOutput i) : SV_TARGET {
     UNITY_LIGHT_ATTENUATION(attenuation, i, i.posWorld.xyz);
 
     float3 _NormalMap_var = tex2D(_NormalMap, i.uv0);
-    float3 normal = lerp(i.normalDir, _NormalMap_var, _Is_NormalMapToBase);
+    float3 normal = lerp(i.normalDir, _NormalMap_var, _BumpScale);
 
     // Half Lambert
     half halfLambert = dot(_WorldSpaceLightPos0, normal) * 0.5 + 0.5;
     half medTone = LinearStep(_LinearStepMin, _LinearStepMax, halfLambert);
-    color = lerp(_1st_ShadeColor, 1, medTone);
+    color = lerp(_ShadeColor, 1, medTone);
+
+    // Rim Light
+    float3 viewNormal = normalize(_WorldSpaceCameraPos - i.posWorld).xyz;
+    half fresnel = pow(1 - saturate(dot(viewNormal, normal)), _Rim_Strength);
+    half4 rimColor = half4((_RimLightColor * fresnel).rgb, 1);
+    color += lerp(0, rimColor, attenuation);    // Ignore shadowed pixel
 
     color *= _LightColor0;
     color *= _BaseColor * tex2D(_MainTex, i.uv0);
 
     // Apply Shadow
-    color.rgb *= lerp(_1st_ShadeColor, 1, attenuation);
+    color.rgb *= lerp(_ShadeColor.rgb, 1, attenuation);
     UNITY_APPLY_FOG(i.fogCoord, color);
     return color;
 }
