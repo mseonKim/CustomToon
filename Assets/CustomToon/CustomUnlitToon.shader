@@ -1,5 +1,4 @@
-// TODO: GI, Clipping, Support Transparent?
-Shader "CustomToon/Toon" {
+Shader "CustomToon/UnlitToon" {
     Properties {
         [Enum(OFF,0,FRONT,1,BACK,2)] _CullMode("Cull Mode", int) = 2  //OFF/FRONT/BACK
         _MainTex ("BaseMap", 2D) = "white" {}
@@ -61,60 +60,8 @@ Shader "CustomToon/Toon" {
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            #include "AutoLight.cginc"
-            #include "Lighting.cginc"
 
-            // Shadow
-            #pragma multi_compile_fwdbase_fullshadows
-            #pragma multi_compile_fog
-            #pragma multi_compile _IS_PASS_FWDBASE
-
-            #include "CustomToonPass.cginc"
-            ENDCG
-        }
-        Pass {
-            Name "Forward_Delta"
-            Tags {
-                "LightMode"="ForwardAdd"
-            }
-            Blend One One
-            Cull[_CullMode]
-
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            #include "AutoLight.cginc"
-            #include "Lighting.cginc"
-
-            // Shadow
-            #pragma multi_compile_fwdbase_fullshadows
-            #pragma multi_compile_fog
-            #pragma multi_compile _IS_PASS_FWDDELTA
-
-            #include "CustomToonPass.cginc"
-            ENDCG
-        }
-        Pass {
-            Name "ShadowCaster"
-            Tags {
-                "LightMode"="ShadowCaster"
-            }
-            Offset 1, 1
-            Cull Off
-            
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-
-            // Shadow
-            #pragma multi_compile_shadowcaster
-            #pragma fragmentoption ARB_precision_hint_fastest
-            #pragma multi_compile_fog
-
-            #include "CustomToonShadowCaster.cginc"
+            #include "CustomUnlitToonPass.cginc"
             ENDCG
         }
     }

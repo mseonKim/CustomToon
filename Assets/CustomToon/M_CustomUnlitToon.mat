@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_CustomToon
-  m_Shader: {fileID: 4800000, guid: adc4a2436add25b4985dafc2d1e72b38, type: 3}
+  m_Name: M_CustomUnlitToon
+  m_Shader: {fileID: 4800000, guid: f3a9755fa2e82b847a19c3e34654b9c7, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -102,7 +102,7 @@ Material:
     - _Is_NormalMapToBase: 0
     - _Is_ShadeMapToBase: 0
     - _LinearStepMax: 0.72
-    - _LinearStepMin: 0.71
+    - _LinearStepMin: 0.7
     - _Metallic: 0
     - _Mode: 0
     - _Nearest_Distance: 0.5
