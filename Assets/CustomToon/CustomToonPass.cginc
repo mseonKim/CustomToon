@@ -11,6 +11,9 @@ uniform float _Rim_Strength;
 uniform sampler2D _MatCap_Sampler; uniform float4 _MatCap_Sampler_ST;
 uniform float _BlurLevelMatcap;
 uniform float4 _MatCapColor;
+uniform float _VRChat;
+uniform float4 _DefaultLightColor;
+uniform float4 _DefaultLightDir;
 
 struct VertexInput {
     float4 vertex : POSITION;
@@ -46,8 +49,9 @@ VertexOutput vert(VertexInput v) {
 }
 
 float4 frag(VertexOutput i) : SV_TARGET {
-    float4 color = 0;
     UNITY_LIGHT_ATTENUATION(attenuation, i, i.posWorld.xyz);
+    float pureAtten = attenuation;
+    attenuation = LinearStep(0.49, 0.51, attenuation);
 
     i.uv0 = TRANSFORM_TEX(i.uv0, _MainTex);
     i.normalDir = normalize(i.normalDir);
@@ -55,41 +59,61 @@ float4 frag(VertexOutput i) : SV_TARGET {
     float3 normal = lerp(i.normalDir, _NormalMap_var, _BumpScale);
 
 #ifdef _IS_PASS_FWDBASE
-    float3 lightDir = _WorldSpaceLightPos0.xyz;
-    float3 lightColor = _LightColor0.rgb;
+    half hasDirectionalLight = LinearStep(0, 0.01, length(_WorldSpaceLightPos0));
+    float3 lightDir = lerp(_DefaultLightDir, _WorldSpaceLightPos0.xyz, hasDirectionalLight);
+    float3 lightColor = lerp(max(0.1, _LightColor0.rgb), max(_LightColor0.rgb, _DefaultLightColor.rgb), _VRChat);
 #elif _IS_PASS_FWDDELTA
 // w == 0 -> Directional lights / w == 1 -> Other lights.
     float3 lightDir = normalize(lerp(_WorldSpaceLightPos0.xyz, (_WorldSpaceLightPos0.xyz - i.posWorld.xyz), _WorldSpaceLightPos0.w));
     // Set intensity as 0 if directional light
-    float3 lightColor = _LightColor0.rgb * lerp(0, attenuation, _WorldSpaceLightPos0.w) * 0.07;
+    float3 lightColor = _LightColor0.rgb * lerp(0, attenuation, _WorldSpaceLightPos0.w) * 0.1;
 #endif
 
+    float3 finalColor = 0;
     // Half Lambert
     half halfLambert = dot(lightDir, normal) * 0.5 + 0.5;
     half medTone = LinearStep(_LinearStepMin, _LinearStepMax, halfLambert);
-    color = lerp(_ShadeColor, _BaseColor, medTone);
+    float3 baseColor = lerp(_ShadeColor.rgb, _BaseColor.rgb, medTone);
+    finalColor = baseColor;
 
     // Rim Light
     float3 viewDir = normalize(_WorldSpaceCameraPos - i.posWorld).xyz;
-    half emission = LinearStep(0.25, 0.75, pow(1 - saturate(dot(viewDir, i.normalDir)), _Rim_Strength));
-    half4 rimColor = half4((_RimLightColor * emission).rgb, 1);
-    color += lerp(0, rimColor, attenuation);    // Ignore shadowed pixel
+    half emission = LinearStep(0.25, 0.75, pow(1 - saturate(dot(viewDir, normal)), _Rim_Strength));
+    half3 rimColor = (_RimLightColor * emission).rgb;
+    finalColor += lerp(0, rimColor, attenuation);    // Ignore shadowed pixel
 
     // Texture
-    color *= tex2D(_MainTex, i.uv0);
+    finalColor *= tex2D(_MainTex, i.uv0).rgb;
 
+    // Light
+    finalColor *= lightColor;
+
+    // Shadow
+    float3 shadowColor = medTone > 0 ? lerp(_ShadeColor.rgb, 1, attenuation) / baseColor : 1;
+#ifdef _IS_PASS_FWDBASE
+    shadowColor = lerp(1, shadowColor, hasDirectionalLight);
+#endif
+    finalColor *= shadowColor;
+    
     // Matcap
     float3 viewNormal = normalize(mul(UNITY_MATRIX_V, normal));
     float2 matcapUV = viewNormal.xy * 0.5 + 0.5;
     float3 _MatCap_Sampler_var = tex2Dlod(_MatCap_Sampler, float4(TRANSFORM_TEX(matcapUV, _MatCap_Sampler), 0.0, _BlurLevelMatcap));
-    color += float4(_MatCap_Sampler_var * _MatCapColor, 1);
-    color.a = 1;
+    finalColor += _MatCap_Sampler_var * _MatCapColor.rgb;
 
-    // Light
-    color.rgb *= lightColor;
+    // Env light
+    float3 decodeLightProbe = ShadeSH9(half4(normal, 1)).xyz;
+    float3 envLightColor = decodeLightProbe < float3(1,1,1) ? decodeLightProbe : float3(1,1,1);
+    float envLightIntensity = 0.299*envLightColor.r + 0.587*envLightColor.g + 0.114*envLightColor.b < 1 ? (0.299*envLightColor.r + 0.587*envLightColor.g + 0.114*envLightColor.b) : 1;
+    finalColor = saturate(finalColor) + envLightColor * envLightIntensity * smoothstep(1, 0, envLightIntensity / 2) * 0.1;
 
-    // Shadow
-    color.rgb *= lerp(_ShadeColor.rgb, 1, attenuation);
+    float4 color = 0;
+#ifdef _IS_PASS_FWDBASE
+    color = float4(finalColor, 1);
+#elif _IS_PASS_FWDDELTA
+    color = float4(finalColor, 0);
+#endif
+
     UNITY_APPLY_FOG(i.fogCoord, color);
     return color;
 }

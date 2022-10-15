@@ -29,6 +29,10 @@ Shader "CustomToon/UnlitToon" {
         _Nearest_Distance ("Nearest_Distance", Float) = 0.5
         _Outline_Sampler ("Outline_Sampler", 2D) = "white" {}
 
+        // VRChat
+        [Toggle(_)] _VRChat ("VRChat", Float) = 0
+        _DefaultLightDir ("Default_Light_Direction", Vector) = (0,0,0,0)
+
     }
     SubShader {
         Tags {

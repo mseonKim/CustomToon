@@ -11,6 +11,8 @@ uniform float _Rim_Strength;
 uniform sampler2D _MatCap_Sampler; uniform float4 _MatCap_Sampler_ST;
 uniform float _BlurLevelMatcap;
 uniform float4 _MatCapColor;
+uniform float _VRChat;
+uniform float4 _DefaultLightDir;
 
 struct VertexInput {
     float4 vertex : POSITION;
@@ -31,7 +33,7 @@ half LinearStep(half minValue, half maxValue, half In) {
 
 VertexOutput vert(VertexInput v) {
     VertexOutput o = (VertexOutput)0;
-    UNITY_TRANSFER_INSTANCE_ID(v, o);
+    // UNITY_TRANSFER_INSTANCE_ID(v, o);
     o.pos = UnityObjectToClipPos(v.vertex);
     o.uv0 = TRANSFORM_TEX(v.texcoord0, _MainTex);
     o.normalDir = UnityObjectToWorldDir(v.normal);
@@ -46,24 +48,27 @@ float4 frag(VertexOutput i) : SV_TARGET {
     float3 _NormalMap_var = tex2D(_NormalMap, i.uv0);
     float3 normal = lerp(i.normalDir, _NormalMap_var, _BumpScale);
 
+    half hasDirectionalLight = LinearStep(0, 0.01, length(_WorldSpaceLightPos0));
+    float3 lightDir = lerp(_DefaultLightDir, _WorldSpaceLightPos0.xyz, hasDirectionalLight);
+
     // Half Lambert
-    half halfLambert = dot(_WorldSpaceLightPos0, i.normalDir) * 0.5 + 0.5;
+    half halfLambert = dot(lightDir, normal) * 0.5 + 0.5;
     half medTone = LinearStep(_LinearStepMin, _LinearStepMax, halfLambert);
-    color = lerp(_ShadeColor, 1, medTone);
+    color = lerp(_ShadeColor, _BaseColor, medTone);
 
     // Rim Light
     float3 viewDir = normalize(_WorldSpaceCameraPos - i.posWorld).xyz;
-    half emission = LinearStep(0.25, 0.75, pow(1 - saturate(dot(viewDir, i.normalDir)), _Rim_Strength));
+    half emission = LinearStep(0.25, 0.75, pow(1 - saturate(dot(viewDir, normal)), _Rim_Strength));
     half4 rimColor = half4((_RimLightColor * emission).rgb, 1);
     color += rimColor;
 
-    color *= _BaseColor * tex2D(_MainTex, i.uv0);
+    color *= tex2D(_MainTex, i.uv0);
 
     // Apply Matcap
     float3 viewNormal = normalize(mul(UNITY_MATRIX_V, normal));
     float2 matcapUV = viewNormal.xy * 0.5 + 0.5;
     float3 _MatCap_Sampler_var = tex2Dlod(_MatCap_Sampler, float4(TRANSFORM_TEX(matcapUV, _MatCap_Sampler), 0.0, _BlurLevelMatcap));
-    color += float4(_MatCap_Sampler_var * _MatCapColor, 1);
+    color.rgb += _MatCap_Sampler_var * _MatCapColor;
 
     return color;
 }
