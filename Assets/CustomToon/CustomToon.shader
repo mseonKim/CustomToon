@@ -34,6 +34,7 @@ Shader "CustomToon/Toon" {
         [Toggle(_)] _VRChat ("VRChat", Float) = 0
         _DefaultLightColor ("DefaultLightColor", Color) = (0.8,0.8,0.8,1)
         _DefaultLightDir ("Default_Light_Direction", Vector) = (0,0,0,0)
+        [Toggle(_)] _FixLightColor ("_FixLightColor", Float) = 0
 
     }
     SubShader {

@@ -14,6 +14,7 @@ uniform float4 _MatCapColor;
 uniform float _VRChat;
 uniform float4 _DefaultLightColor;
 uniform float4 _DefaultLightDir;
+uniform float _FixLightColor;
 
 struct VertexInput {
     float4 vertex : POSITION;
@@ -62,6 +63,7 @@ float4 frag(VertexOutput i) : SV_TARGET {
     half hasDirectionalLight = LinearStep(0, 0.01, length(_WorldSpaceLightPos0));
     float3 lightDir = lerp(_DefaultLightDir, _WorldSpaceLightPos0.xyz, hasDirectionalLight);
     float3 lightColor = lerp(max(0.1, _LightColor0.rgb), max(_LightColor0.rgb, _DefaultLightColor.rgb), _VRChat);
+    lightColor = lerp(lightColor, _DefaultLightColor, _FixLightColor);
 #elif _IS_PASS_FWDDELTA
 // w == 0 -> Directional lights / w == 1 -> Other lights.
     float3 lightDir = normalize(lerp(_WorldSpaceLightPos0.xyz, (_WorldSpaceLightPos0.xyz - i.posWorld.xyz), _WorldSpaceLightPos0.w));
